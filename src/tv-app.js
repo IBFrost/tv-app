@@ -29,15 +29,17 @@ export class TvApp extends LitElement {
     return [
       css`
       :host {
-        display: flex;
-        margin: .5rem .5rem .25rem .5rem;
+        display: block;
+        margin: 16px;
         padding: 16px;  
       }
+
       .listing-container {
         justify-self: center;
-        max-width: 1344px;
+        max-width: 1344px ;
         justify-items: left;
         display: flex;
+        float: none;
         flex-direction: row;
         flex-grow: 1;
         flex-wrap: nowrap;
@@ -54,9 +56,7 @@ export class TvApp extends LitElement {
         line-height: 1.5;
         font-size: 1em;
       }
-      h5 {
-        font-weight: 400;
-      }
+
       .
       `,
     ];

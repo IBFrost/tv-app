@@ -30,7 +30,7 @@ export class TvChannel extends LitElement {
         font-size: 1em;
         font-weight: 400;
         min-width: 300px;
-        margin: 0;
+        margin: .5rem .5rem .25rem .5rem;
         padding: 0;
         transition: all 0.25s ease-in-out;
         overflow: hidden;
@@ -48,6 +48,10 @@ export class TvChannel extends LitElement {
       }
       p {
         font-size: 12px;
+      }
+      h5 {
+        margin: 0;
+        font-weight: 400;
       }
 
     `;
