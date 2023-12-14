@@ -13,11 +13,13 @@ export class TvApp extends LitElement {
     this.source = new URL("../assets/channels.json", import.meta.url).href;
     this.listings = [];
     this.activeItem = {
-      id: null,
-      title: null,
-      presenter: null,
-      description: null,
-      video: null,
+      id: "item-000-000-102",
+      title: "Rick Astley - Never Gonna Give You Up (Official Music Video)",
+      presenter: "Rick Astley",
+      description:
+        "The official video for “Never Gonna Give You Up” by Rick Astley.",
+      video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      timecode: 4,
     };
     this.nextItem = {
       id: null,
@@ -25,6 +27,7 @@ export class TvApp extends LitElement {
       presenter: null,
       description: null,
       video: null,
+      timecode: null,
     };
   }
   // convention I enjoy using to define the tag's name
@@ -50,49 +53,76 @@ export class TvApp extends LitElement {
         }
 
         header {
+          padding-left: 8px;
+          margin: 0 auto;
+          max-width: 1344px;
+          display: flex;
           color: #000;
-          padding: 16px;
-          text-align: center;
+          text-align: left;
+          margin: 0 auto;
+          width: 100%;
+          position: relative;
+          line-height: 24px;
+          font-size: 16;
+          font-family: Press_Start_2P
         }
 
         .h1 {
-          font-size: 32px;
-          margin-bottom: 16px;
+          font-size: 16px;
+        }
+
+        h2{
+          line-height: 1em;
         }
 
         .channel-container {
-          margin-left: 16px;
-          margin-right: 16px;
-          max-width: 100%;
+          margin: 0 auto;
+          max-width: 1344px;
           display: flex;
+          justify-items: left;
           flex-direction: row;
           flex-grow: 1;
           flex-wrap: nowrap;
           overflow-x: auto;
           overflow-y: auto;
+          padding-left: 4px;
+          padding-right: 4px;
+          text-rendering: optimizeLegibility;
+          width: 100%;
+          margin: 0 auto;
+          position: relative;
+          animation-delay: 1s;
+          animation-duration: 1s;
+          line-height: 1;
+          font-size: 1em;
         }
 
         .main-content {
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
-          margin: 12px;
+          margin: 16px;
+          margin-left: 32px;
+          margin-right: 32px;
         }
 
         .player-container {
-          border-radius: 8px;
-          padding: 12px;
           flex-grow: 10;
-          flex-basis: calc(66% - 32px); /* 66% minus padding on both sides */
+          flex-basis: calc(50% - 32px); /* 66% minus padding on both sides */
           flex-shrink: 3;
           min-width: 445px;
           min-height: 250px;
+          padding: 12px;
+          border-collapse: separate; 
+          border-radius: 8px;
         }
 
         .player {
+          border-radius: 8px;
           width: 100%;
           aspect-ratio: 16/9;
           border-radius: 8px;
+          max-height: 75%;
         }
 
         .discord {
@@ -100,8 +130,8 @@ export class TvApp extends LitElement {
           padding: 12px;
           flex-grow: 10; /* Adjust the flex-grow value */
           min-width: 0; /* Allow the box to shrink beyond its content */
-          flex-shrink: 2;
-          min-height: 300px;
+          flex-shrink: 3;
+          min-height: 350px;
         }
 
         .discord widgetbot {
@@ -119,9 +149,20 @@ export class TvApp extends LitElement {
           width: inherit;
           height: 100%;
         }
-        .video-descritpion {
-          flex-grow: 10;
+        .video-description {
+          max-width: 80%;
+          padding-left: 32px;
+          display: inline-flex;
         }
+        .video-description .wrapper{
+          width: 80%;
+        }
+        img{
+          width: 10%;
+          border-radius: 12px;
+          padding: 4px;
+        }
+
       `,
     ];
   }
@@ -129,7 +170,7 @@ export class TvApp extends LitElement {
   render() {
     return html`
       <header>
-        <h1>${this.name}</h1>
+      <img src="https://ps.w.org/haxtheweb/assets/banner-772x250.png?rev=2316092" alt="HAX the Web Logo"><h1>${this.name}</h1>
       </header>
 
       <div class="channel-container">
@@ -141,6 +182,7 @@ export class TvApp extends LitElement {
               presenter="${item.metadata.author}"
               description="${item.description}"
               video="${item.metadata.source}"
+              timecode="${item.metadata.timecode}"
               @click="${this.itemClick}"
             >
             </tv-channel>
@@ -150,7 +192,6 @@ export class TvApp extends LitElement {
       <div class="main-content">
         <div class="player-container">
           <!-- video -->
-
           <video-player
             class="player"
             source="${this.createSource()}"
@@ -159,13 +200,6 @@ export class TvApp extends LitElement {
             track="https://haxtheweb.org/files/HAXshort.vtt"
           >
           </video-player>
-          <div class="video-description">
-            <tv-channel
-              title="${this.activeItem.title}"
-              presenter="${this.activeItem.presenter}"
-              ><p>${this.activeItem.description}</p></tv-channel
-            >
-          </div>
         </div>
 
         <!-- discord / chat - optional -->
@@ -184,6 +218,14 @@ export class TvApp extends LitElement {
           <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
         </div>
       </div>
+      <tv-channel
+        class="video-description"
+        timecode=${this.activeItem.timecode}
+      >
+        <h2>${this.activeItem.title}</h2>
+        <h3>${this.activeItem.presenter}</h3>
+        <p>${this.activeItem.description}</p>
+      </tv-channel>
       <!-- dialog -->
       <sl-dialog label=" ${this.nextItem.title}" class="dialog">
         <p class="dialog-description">
@@ -197,11 +239,15 @@ export class TvApp extends LitElement {
   }
 
   changeVideo() {
-    // Update the iframe source URL when an item is clicked
-    const iframe = this.shadowRoot.querySelector('video-player').querySelector("iframe");
+    const iframe = this.shadowRoot
+      .querySelector("video-player")
+      .querySelector("iframe");
     iframe.src = this.createSource();
-    
-    this.shadowRoot.querySelector('video-player').shadowRoot.querySelector('a11y-media-player').play()
+
+    this.shadowRoot
+      .querySelector("video-player")
+      .shadowRoot.querySelector("a11y-media-player")
+      .play();
   }
 
   extractVideoID(link) {
@@ -227,17 +273,14 @@ export class TvApp extends LitElement {
     dialog.hide();
   }
 
-  watchVideo() {
-    this.activeItem = {
-      id: this.nextItem.id,
-      title: this.nextItem.title,
-      presenter: this.nextItem.presenter,
-      description: this.nextItem.description,
-      video: this.nextItem.video,
-    };
-    this.closeDialog();
-    this.changeVideo();
-    
+  watchVideo(e) {
+    const dialog = this.shadowRoot.querySelector(".dialog");
+    dialog.hide();
+    this.activeItem = this.nextItem;
+    this.shadowRoot
+      .querySelector("video-player")
+      .shadowRoot.querySelector("a11y-media-player")
+      .play();
   }
 
   itemClick(e) {
@@ -247,6 +290,7 @@ export class TvApp extends LitElement {
       presenter: e.target.presenter,
       description: e.target.description,
       video: e.target.video,
+      timecode: e.target.timecode,
     };
     const dialog = this.shadowRoot.querySelector(".dialog");
     dialog.show();
